@@ -62,9 +62,27 @@ const store = new Store();
 
 // Weather Service
 class WeatherService {
-    static async getWeatherForLocation(lat, lng) {
-        // Using mock data instead of API
-        return MOCK_WEATHER;
+    static getWeatherForLocation() {
+        return {
+            current: {
+                temp_c: 31,
+                condition: { text: 'Partly cloudy', icon: '🌤️' },
+                wind_kph: 20,
+                humidity: 75
+            },
+            forecast: {
+                forecastday: [{
+                    date: new Date().toLocaleDateString(),
+                    day: {
+                        maxtemp_c: 32,
+                        mintemp_c: 26,
+                        condition: { text: 'Afternoon thunderstorm', icon: '⛈️' },
+                        humidity: 80,
+                        uv: 11
+                    }
+                }]
+            }
+        };
     }
 }
 
@@ -227,11 +245,10 @@ async function initApp() {
 
     // Get user's location (with permission)
     if ('geolocation' in navigator) {
-        navigator.geolocation.getCurrentPosition(
-            async position => {
+        navigator.geolocation.getCurrentPosition(            position => {
                 const { latitude, longitude } = position.coords;
                 store.setState({ currentLocation: { lat: latitude, lng: longitude } });
-                const weatherData = await WeatherService.getWeatherForLocation(latitude, longitude);
+                const weatherData = WeatherService.getWeatherForLocation();
                 store.setState({ weather: weatherData });
                 UI.updateWeatherDisplay(weatherData);
             },
