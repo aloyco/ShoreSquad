@@ -3,11 +3,31 @@
 
 // Constants
 const CONFIG = {
-    WEATHER_API_KEY: 'YOUR_API_KEY', // To be replaced with actual API key
-    MAP_API_KEY: 'YOUR_API_KEY',     // To be replaced with actual API key
     DEFAULT_LOCATION: {
-        lat: 34.0522,
-        lng: -118.2437
+        lat: 1.2494,
+        lng: 103.8303
+    }
+};
+
+// Mock weather data for demo
+const MOCK_WEATHER = {
+    current: {
+        temp_c: 31,
+        condition: { text: 'Partly cloudy', icon: '🌤️' },
+        wind_kph: 20,
+        humidity: 75
+    },
+    forecast: {
+        forecastday: [{
+            date: new Date().toLocaleDateString(),
+            day: {
+                maxtemp_c: 32,
+                mintemp_c: 26,
+                condition: { text: 'Afternoon thunderstorm', icon: '⛈️' },
+                humidity: 80,
+                uv: 11
+            }
+        }]
     }
 };
 
@@ -43,17 +63,8 @@ const store = new Store();
 // Weather Service
 class WeatherService {
     static async getWeatherForLocation(lat, lng) {
-        try {
-            const response = await fetch(
-                `https://api.weatherapi.com/v1/forecast.json?key=${CONFIG.WEATHER_API_KEY}&q=${lat},${lng}&days=3`
-            );
-            if (!response.ok) throw new Error('Weather data fetch failed');
-            const data = await response.json();
-            return data;
-        } catch (error) {
-            console.error('Weather fetch error:', error);
-            return null;
-        }
+        // Using mock data instead of API
+        return MOCK_WEATHER;
     }
 }
 
@@ -66,22 +77,42 @@ class MapManager {
 
     async initMap() {
         try {
-            // Will be replaced with actual map initialization
-            // (Google Maps, Mapbox, or Leaflet)
-            this.map = await this.createMap();
+            const mapContainer = document.getElementById('cleanup-map');
+            if (!mapContainer) return;
+            
+            // Set a fixed height for the map container
+            mapContainer.style.height = '400px';
+            
+            // Initialize Leaflet map
+            this.map = L.map('cleanup-map').setView([CONFIG.DEFAULT_LOCATION.lat, CONFIG.DEFAULT_LOCATION.lng], 13);
+            
+            // Add OpenStreetMap tiles
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(this.map);            // Add markers for Singapore beach cleanup locations
+            L.marker([1.2494, 103.8303]) // Siloso Beach
+                .bindPopup('Beach Cleanup Event<br>June 15, 2025 - 8 AM<br>Siloso Beach, Sentosa')
+                .addTo(this.map);
+            
+            L.marker([1.2485, 103.8245]) // Palawan Beach
+                .bindPopup('Beach Cleanup Event<br>June 22, 2025 - 8 AM<br>Palawan Beach, Sentosa')
+                .addTo(this.map);
+                
+            L.marker([1.2463, 103.8293]) // Tanjong Beach
+                .bindPopup('Beach Cleanup Event<br>June 29, 2025 - 8 AM<br>Tanjong Beach, Sentosa')
+                .addTo(this.map);
+
             this.addEventListeners();
         } catch (error) {
             console.error('Map initialization error:', error);
         }
     }
 
-    createMap() {
-        // Placeholder for map creation
-        console.log('Map creation will be implemented');
-    }
-
     addEventListeners() {
-        // Map event listeners will be added here
+        if (!this.map) return;
+        this.map.on('click', (e) => {
+            console.log('Map clicked at:', e.latlng);
+        });
     }
 }
 
@@ -93,7 +124,23 @@ class UI {
             weatherContainer.innerHTML = '<p>Weather data unavailable</p>';
             return;
         }
-        // Weather display implementation
+
+        const { current, forecast } = weatherData;        weatherContainer.innerHTML = `
+            <div class="weather-current">
+                <h3>Current Weather at Sentosa</h3>
+                <p>${current.temp_c}°C ${current.condition.icon}</p>
+                <p>${current.condition.text}</p>
+                <p>Wind: ${current.wind_kph} km/h</p>
+                <p>Humidity: ${current.humidity}%</p>
+            </div>
+            <div class="weather-forecast">
+                <h3>Today's Forecast</h3>
+                <p>Temperature: ${forecast.forecastday[0].day.mintemp_c}°C - ${forecast.forecastday[0].day.maxtemp_c}°C</p>
+                <p>${forecast.forecastday[0].day.condition.text} ${forecast.forecastday[0].day.condition.icon}</p>
+                <p>UV Index: ${forecast.forecastday[0].day.uv} (High)</p>
+                <p class="weather-tips">🌞 Don't forget sunscreen and water!</p>
+            </div>
+        `;
     }
 
     static showLoader() {
@@ -107,8 +154,43 @@ class UI {
 
 // Event handlers
 function setupEventListeners() {
+    const modal = document.getElementById('joinModal');
+    const closeButton = document.querySelector('.close-button');
+    const joinForm = document.getElementById('joinForm');
+
     document.querySelector('.cta-button')?.addEventListener('click', () => {
-        // Handle CTA button click
+        modal.style.display = 'block';
+    });
+
+    closeButton?.addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
+
+    // Close modal when clicking outside
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+
+    // Handle form submission
+    joinForm?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const formData = {
+            name: document.getElementById('name').value,
+            email: document.getElementById('email').value,
+            eventDate: document.getElementById('eventDate').value
+        };
+        
+        // Store the registration
+        const events = JSON.parse(localStorage.getItem('beachCleanupEvents') || '[]');
+        events.push(formData);
+        localStorage.setItem('beachCleanupEvents', JSON.stringify(events));
+        
+        // Show success message and close modal
+        alert('Thanks for joining! We\'ll send you an email with the details.');
+        modal.style.display = 'none';
+        joinForm.reset();
     });
 
     // Implement smooth scrolling for navigation

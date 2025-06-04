@@ -9,6 +9,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Add Leaflet CSS and JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
     <header class="header">
@@ -44,11 +47,70 @@
                 <!-- Weather info will be displayed here -->
             </div>
         </section>
+
+        <section id="beaches" class="beaches-section">
+            <h2>Our Cleanup Locations</h2>
+            <div class="beach-cards">
+                <div class="beach-card">
+                    <h3>Siloso Beach</h3>
+                    <p>Known for its beach volleyball courts and exciting water sports activities. Help us keep this vibrant beach clean!</p>
+                    <ul class="beach-info">
+                        <li>🌊 Gentle waves, perfect for beginners</li>
+                        <li>🚌 Bus: Take Sentosa Bus 1 or 2</li>
+                        <li>🕒 Meeting point: Siloso Beach Station</li>
+                    </ul>
+                </div>
+                <div class="beach-card">
+                    <h3>Palawan Beach</h3>
+                    <p>Family-friendly beach with a suspension bridge leading to the Southernmost Point of Continental Asia.</p>
+                    <ul class="beach-info">
+                        <li>🏖️ Sheltered lagoon</li>
+                        <li>🚶‍♂️ 5-min walk from Beach Station</li>
+                        <li>🕒 Meeting point: Palawan Pirate Ship</li>
+                    </ul>
+                </div>
+                <div class="beach-card">
+                    <h3>Tanjong Beach</h3>
+                    <p>The quietest of Sentosa's beaches, perfect for those seeking a peaceful cleanup experience.</p>
+                    <ul class="beach-info">
+                        <li>🌅 Beautiful sunrise views</li>
+                        <li>🚌 Take Sentosa Bus 3</li>
+                        <li>🕒 Meeting point: Tanjong Beach Club</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
     </main>
 
     <footer class="footer">
         <p>&copy; 2025 ShoreSquad. All rights reserved.</p>
     </footer>
+
+    <!-- Add Modal -->
+    <div id="joinModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Join Next Beach Cleanup</h2>
+            <form id="joinForm">
+                <div class="form-group">
+                    <label for="name">Your Name:</label>
+                    <input type="text" id="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="eventDate">Event Date:</label>                    <select id="eventDate" required>
+                        <option value="2025-06-15">June 15, 2025 - Siloso Beach, Sentosa</option>
+                        <option value="2025-06-22">June 22, 2025 - Palawan Beach, Sentosa</option>
+                        <option value="2025-06-29">June 29, 2025 - Tanjong Beach, Sentosa</option>
+                    </select>
+                </div>
+                <button type="submit" class="submit-button">Register</button>
+            </form>
+        </div>
+    </div>
 
     <script src="js/app.js"></script>
 </body>
